@@ -5,9 +5,21 @@ import requests
 from playwright.sync_api import *
 import os
 
+# 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
+USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
+
+#找一下位置，加点目录
+CURRENT_PATH = os.path.abspath(__file__)
+CURRENT_DIR = os.path.dirname(CURRENT_PATH)
+CURRENT_DIR = CURRENT_DIR.replace("\\","/")
+if not os.path.exists(CURRENT_DIR+'/results'):
+    os.mkdir(CURRENT_DIR+'/results')
+if not os.path.exists(CURRENT_DIR+'/results/csv'):
+    os.mkdir(CURRENT_DIR+'/results/csv')
+
+
 # 获取cookies
 def setBiliBiliCookies(bv='BV1GJ411x7h7') -> str: 
-    USER_DIR_PATH = f"C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
     url = f'https://www.bilibili.com/video/'+bv
     # 模拟浏览器方式获取cookies
     try:
@@ -101,7 +113,7 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
 
 # 数据写入csv
 def write_csv(inputlist,filename = 'default.csv'):
-    with open('./new_project/result/'+filename,'w',newline='',encoding='utf-8') as f:
+    with open(CURRENT_DIR+'/result/csv/'+filename,'w',newline='',encoding='utf-8') as f:
         fields = ['author', 'bvid', 'title', 'play', 'video_review', 'favorites', 'review', 'date']
         writer = csv.DictWriter(f,fieldnames=fields)
         writer.writeheader()
