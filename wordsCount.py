@@ -17,8 +17,8 @@ if not os.path.exists(CURRENT_DIR+'/results/json'):
 if not os.path.exists(CURRENT_DIR+'/results/words-count-txt'):
     os.mkdir(CURRENT_DIR+'/results/words-count-txt')
 
-
-def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:# 统计词频
+# 统计词频
+def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:
     s = open(txt_path+txt_name, 'r', encoding='utf-8').read()
     # 结巴分词，分词表见./resources/stopwords
     jieba.load_userdict(txt_path+txt_name)
@@ -36,21 +36,21 @@ def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:
     words_list.sort(key=lambda x: x[1], reverse=True)  # 排序
     return words_list # 返回词汇-词频元组的列表
 
+# 保存词频统计结果到./results/words_count.json，用于后续处理
 def save_words_count_to_json(words_list: list, words_count_json_name="default_words_count.json", json_path=RESULTS_DIR+"/json/"):
-    # 保存词频统计结果到./results/words_count.json，用于后续处理
     print("write into "+words_count_json_name)
     with open(json_path+words_count_json_name, 'w', encoding='utf-8') as f:
         f.write(json.dumps(dict(words_list), indent=4))
     f.close()
 
+# 保存到txt方便查看词语内容
 def save_words_count_to_txt(words_dict, file_name="default_words_count.txt"):
-    # 保存到txt方便查看词语内容
     with open(RESULTS_DIR + '/words-count-txt/'+file_name, "w", encoding='utf-8') as f:
         for word in words_dict:
             f.write(f'{word}:{words_dict[word][0]}, {words_dict[word][1]}\n')
 
+# 统计词性，保存到./results/json/words_class.json，以便筛选
 def save_words_class_to_json(words_class_json_name="default_words_class.json", words_count_json_name="default_words_count.json", json_path=RESULTS_DIR + "/json/"):
-    # 统计词性，保存到./results/json/words_class.json，以便筛选
     with open(json_path+words_count_json_name, 'r', encoding='utf-8') as f:
         words = dict(json.load(f))
     f.close()
@@ -67,6 +67,7 @@ def save_words_class_to_json(words_class_json_name="default_words_class.json", w
         json.dump(words, f, indent=4)
     f.close()
 
+# 生成词云图
 def generate_wordcloud(words_dict,
                        wordcloud_name="wordcloud.png",
                        wordcloud_path=RESULTS_DIR + '/wordcloud/',
@@ -77,7 +78,6 @@ def generate_wordcloud(words_dict,
                        height=600,
                        font_name='simfang.ttf', 
                        font_path=CURRENT_DIR + '/resources/font/'):
-    # 生成词云图
     print("generate " + wordcloud_name)
     w = wordcloud.WordCloud(background_color=background_color,
                             width=width,
@@ -90,9 +90,9 @@ def generate_wordcloud(words_dict,
     img.show()
     # 保存词云图生成结果
     w.to_file(wordcloud_path + wordcloud_name)
-    
+
+# 更新统计数据实现部分词性的删除
 def handle(file_name, del_list = ['c', 'm', 'u', 'b', 'e', 'p', 'q', 'o', 's', 'l', 'j']):
-    # 更新统计数据实现部分词性的删除
     with open(RESULTS_DIR + "/json/"+file_name+'_words_class.json', "r", encoding="utf-8") as f:
         words_class = dict(json.load(f))
     f.close()
@@ -111,8 +111,8 @@ def handle(file_name, del_list = ['c', 'm', 'u', 'b', 'e', 'p', 'q', 'o', 's', '
         del words_class[del_word]
     return words_count, words_class
 
+# 完成以上操作(丝滑小连招
 def save_words_to_all(file_name='default'):
-    # 丝滑小连招
     word_list = words_count(txt_name=file_name+'.txt')
     save_words_count_to_json(word_list, file_name+'_words_count.json')
     save_words_class_to_json(file_name+'_words_class.json', file_name+'_words_count.json')
