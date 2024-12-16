@@ -8,7 +8,7 @@ import os
 # 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
 USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
 
-#找一下位置，加点目录
+# 找一下位置，加点目录
 CURRENT_PATH = os.path.abspath(__file__)
 CURRENT_DIR = os.path.dirname(CURRENT_PATH)
 CURRENT_DIR = CURRENT_DIR.replace("\\","/")
@@ -112,7 +112,7 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
     return return_dict
 
 # 数据写入csv
-def write_csv(inputlist,filename = 'default.csv'):
+def write_csv(inputlist: list,filename = 'default.csv'): # 输入数据列表，格式与上面video_info相同
     with open(CURRENT_DIR+'/result/csv/'+filename,'w',newline='',encoding='utf-8') as f:
         fields = ['author', 'bvid', 'title', 'play', 'video_review', 'favorites', 'review', 'date']
         writer = csv.DictWriter(f,fieldnames=fields)
