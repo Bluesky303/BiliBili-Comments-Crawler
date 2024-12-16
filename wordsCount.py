@@ -16,6 +16,8 @@ if not os.path.exists(CURRENT_DIR+'/results/json'):
     os.mkdir(CURRENT_DIR+'/results/json')
 if not os.path.exists(CURRENT_DIR+'/results/words-count-txt'):
     os.mkdir(CURRENT_DIR+'/results/words-count-txt')
+if not os.path.exists(CURRENT_DIR+'/results/wordcloud'):
+    os.mkdir(CURRENT_DIR+'/results/wordcloud')
 
 # 统计词频
 def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:
