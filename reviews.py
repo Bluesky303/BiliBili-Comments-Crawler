@@ -1,11 +1,9 @@
 '''评论获取'''
 import time
-import search
 import requests
-import random
 
-def fetch_comments(video_bv, cookies, max_pages=100):
-    '''爬取评论'''
+# 爬取评论
+def fetch_comments(video_bv, cookies, max_pages=100, sleeptime = 1):
     # 构造请求头
     headers = {
         'Cookie': cookies,
@@ -14,8 +12,6 @@ def fetch_comments(video_bv, cookies, max_pages=100):
     comments = []
     page = 1
     last_count = 0
-    last_page = 0
-    last_cookies = headers['Cookie']
     while page <= max_pages+1:
         # b站评论api
         url = f'https://api.bilibili.com/x/v2/reply'
@@ -47,43 +43,42 @@ def fetch_comments(video_bv, cookies, max_pages=100):
                             'time': comment['ctime']
                         }
                         comments.append(comment_info)
-                if last_count == len(comments):
+                if last_count == len(comments): # 说明到底了
                     break
                 last_count = len(comments)
-            elif response.status_code == 412:#412码更换
-                headers['Cookie'] = search._setCookies(bv= video_bv)
-                
-                print('reset Cookies')
+            elif response.status_code == 412: # 412码歇着
+                if not stoptime:
+                    stoptime = time.asctime()
+                print(f"412了, 哥们从{stoptime}歇到现在")
+                time.sleep(300)
                 page -= 1
-                if(page == last_page):
-                    if headers['Cookie'] == last_cookies:
-                        time.sleep(10)
-                        last_cookies = headers['Cookie']
-                    time.sleep(random.uniform(1,5))
-                last_page = page
         except requests.RequestException as e:
             print(f"请求出错: {e}")
             break
         response.close()
         page += 1
-        time.sleep(1)  #控制请求频率
+        time.sleep(sleeptime)  # 控制请求频率
     print('爬取完成')
     return comments
 
-def purify(comment):
-    """去除评论中的表情文本，以免影响分词和词云图结果"""
-    s = ''
-    stack = []
-    i = 0
-    cnt = 0
-    while i < len(comment):
-        if comment[i] == '[':
-            stack.append(i-cnt)
-        elif comment[i] == ']' and stack != []:
-            s = s[:stack[-1]]
-            cnt += i-cnt-stack[-1]+1
-            stack.pop()
-        if comment[i] != ']':
-            s += comment[i]
-        i += 1
-    return s
+# 去除评论中的表情文本，以免影响分词和词云图结果
+# 后果是所有[]中括号以及里面的都被删了，建立表情列表可能可以解决
+def purify(comment):    
+    return_comment = ''
+    open_braket_stack = []
+    current_pos = 0
+    delete_count = 0
+    while current_pos < len(comment):
+        #记录所有左中括号位置
+        if comment[current_pos] == '[':
+            open_braket_stack.append(current_pos-delete_count)
+        #遇到右中括号删去到上一个左中括号之间的内容并记录区间长度
+        elif comment[current_pos] == ']' and open_braket_stack != []:
+            return_comment = return_comment[:open_braket_stack[-1]]
+            delete_count = current_pos-open_braket_stack[-1]+1
+            open_braket_stack.pop()
+        #啥都不是直接加进来
+        if comment[current_pos] != ']':
+            return_comment += comment[current_pos]
+        current_pos += 1
+    return return_comment

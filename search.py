@@ -73,15 +73,14 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
         
         try:
             response = requests.get(mainUrl, headers=headers, params=params)
-            
             # 检查响应状态码是否为200，即成功
             if response.status_code == 200:
+                stoptime = 0
                 data = response.json()
                 if not data['data']['result']: break # 没返回大概就是翻页翻完了
                 # 遍历结果视频列表
                 for video_num in range(20):
                     video_data = data['data']['result'][video_num]
-                    
                     # 挑选需要的数据
                     video_info = {
                         'author': video_data['author'],
@@ -96,9 +95,11 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
                     return_dict.append(video_info)
                     
             elif response.status_code == 412: # 412码，大概是被封ip了，歇着或者换ip罢
-                print(time.asctime())
-                print("412error")
+                if not stoptime:
+                    stoptime = time.asctime()
+                print(f"412了, 哥们从{stoptime}歇到现在")
                 time.sleep(300)
+                page -= 1
             else:
                 print(f'请求失败，状态码：{response.status_code}')
                 break
@@ -107,7 +108,7 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
             print('发生错误', e)
             break
         time.sleep(sleeptime)  # 控制请求频率
-        page+=1
+        page += 1
     print("爬取完成")
     return return_dict
 
