@@ -119,5 +119,5 @@ def save_words_to_all(file_name='default'):
     save_words_count_to_json(word_list, file_name+'_words_count.json')
     save_words_class_to_json(file_name+'_words_class.json', file_name+'_words_count.json')
     words_dict, words_class = handle(file_name)
-    save_words_count_to_txt(words_dict, file_name = file_name+"_words_count.txt")
+    save_words_count_to_txt(words_class, file_name = file_name+"_words_count.txt")
     generate_wordcloud(words_dict, wordcloud_name = file_name+'_wordcloud.png')
