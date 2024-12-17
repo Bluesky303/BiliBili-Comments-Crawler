@@ -95,7 +95,7 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
                         'video_review': video_data['video_review'],
                         'favorites': video_data['favorites'],
                         'review': video_data['review'],
-                        'date': video_data['pubdate'],
+                        'date': time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(video_data['pubdate'])),
                     }
                     return_dict.append(video_info)
                     
@@ -118,7 +118,7 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
     return return_dict
 
 # 数据写入excel
-def write_excel(inputlist: list,filename = 'default.xlsx', sheet_name = 'all'): # 输入数据列表，格式与上面video_info相同
+def write_excel(inputlist: list, filename = 'default.xlsx'): # 输入数据列表，格式与上面video_info相同
     # 数据预处理
     data = {'author': [], 'bvid': [], 'title': [], 'play': [], 'video_review': [], 'favorites': [], 'review': [], 'date': []}
     for video in inputlist:
@@ -126,18 +126,25 @@ def write_excel(inputlist: list,filename = 'default.xlsx', sheet_name = 'all'): 
             data[key].append(video[key])
     data = pd.DataFrame(data)
     # 写入excel
-    if os.path.exists(RESULTS_DIR+'/excel/'+filename):
-        book = openpyxl.load_workbook(RESULTS_DIR+'/excel/'+filename)
-        with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
-            writer.book = book
-            data.to_excel(writer, sheet_name=sheet_name)
-    else: 
-        with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
-            data.to_excel(writer, sheet_name=sheet_name)
+    with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
+        data.to_excel(writer)
+
+#写入多个工作表，输入字典，key为工作表名字
+def sheets_write_excel(inputdict: dict, filename = 'default.xlsx'):
+    with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
+        for name in inputdict:
+            # 数据预处理
+            data = {'author': [], 'bvid': [], 'title': [], 'play': [], 'video_review': [], 'favorites': [], 'review': [], 'date': []}
+            for video in inputdict[name]:
+                for key in video:
+                    data[key].append(video[key])
+            data = pd.DataFrame(data)
+            # 写入excel
+            data.to_excel(writer,sheet_name=name)
     
 # 关键词列表搜索，合并关键词列表在同一时间段下的所有视频,开始时间和结束时间为时间戳
 # 写入excel文件待用，名字用第一个关键词,工作表名用开始时间-结束时间，没有输入时间不用时间
-def keyword_list_search(keyword_list: list, begin_time=0, end_time=0, maxpage = 50) -> list:
+def keyword_list_search(keyword_list: list, begin_time=0, end_time=0, maxpage = 50, sort_key = 'review', to_excel = True) -> list:
     result_list = []
     for keyword in keyword_list: 
         result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage)
@@ -149,30 +156,34 @@ def keyword_list_search(keyword_list: list, begin_time=0, end_time=0, maxpage = 
         else: 
             result_list.remove(video)
     # 排序，以评论数为key
-    result_list = sorted(result_list, key = lambda x: x['review'], reverse=True)
+    result_list = sorted(result_list, key = lambda x: x[sort_key], reverse=True)
     # 写入对应excel
-    if not begin_time and not end_time:
-        begin_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(begin_time))
-        end_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(end_time))
-        sheet_name = f'{begin_time}t{end_time}'
-    else:
-        sheet_name = 'all'
-    excel_file_name = f'{keyword_list[0]}.xlsx'
-    write_excel(result_list, filename = excel_file_name, sheet_name = sheet_name)
+    if to_excel:
+        if not begin_time and not end_time:
+            begin_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(begin_time))
+            end_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(end_time))
+            excel_file_name = f'{keyword_list[0]}-{begin_time} to {end_time}.xlsx'
+        else:
+            excel_file_name = f'{keyword_list[0]}.xlsx'
+        write_excel(result_list, filename = excel_file_name)
     return result_list
     
 # 时间列表搜索，其中时间列表每个元素是开始时间和结束时间的元组，
-def time_list_search(keyword_list, time_list = [], maxpage = 50):
-    all_list = []
+def time_list_search(keyword_list, time_list = [], maxpage = 50, sort_key = 'review'):
+    result_dict = {'all':[]}
     for time_tuple in time_list:
-        all_list += keyword_list_search(keyword_list, time_tuple[0], time_tuple[1], maxpage = maxpage)
+        return_result = keyword_list_search(keyword_list, time_tuple[0], time_tuple[1], maxpage = maxpage, sort_key=sort_key, to_excel=False)
+        begin_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(time_tuple[0]))
+        end_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(time_tuple[1]))
+        result_dict[f'{begin_time}-{end_time}'] = return_result
+        result_dict['all'] += return_result
     # 总列表去重排序
     bvlist = []
-    for video in all_list:
+    for video in result_dict['all']:
         if video['bvid'] not in bvlist:
             bvlist.append(video['bvid'])
         else: 
-            all_list.remove(video)
-    all_list = sorted(all_list, key = lambda x: x['review'], reverse=True)
+            result_dict['all'].remove(video)
+    result_dict['all'] = sorted(result_dict['all'], key = lambda x: x[sort_key], reverse=True)
     # 写入excel
-    write_excel(all_list, filename = f'{keyword_list[0]}.xlsx')
+    sheets_write_excel(result_dict, filename=f'{keyword_list[0]}.xlsx')
