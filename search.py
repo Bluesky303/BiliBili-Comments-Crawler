@@ -4,7 +4,6 @@ import requests
 from playwright.sync_api import *
 import os
 import pandas as pd
-import openpyxl
 
 # 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
 USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"

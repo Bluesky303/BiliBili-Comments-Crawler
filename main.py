@@ -12,7 +12,7 @@ RESULTS_DIR = CURRENT_DIR + "/results"
 
 time_list = [(1451577600,1467302400),(1467302400,1483200000)]
 keyword_list = ['川普','特朗普']
-cookies = "***REMOVED***"
+cookies = ""
 
 if __name__ == '__main__':
     '''执行所有操作'''
