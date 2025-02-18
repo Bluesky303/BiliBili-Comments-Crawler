@@ -2,22 +2,11 @@
 import time
 import requests
 from playwright.sync_api import *
-import os
 import pandas as pd
 
+from .path import RESULTS_DIR
 # 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
 USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
-
-# 找一下位置，加点目录
-CURRENT_PATH = os.path.abspath(__file__)
-CURRENT_DIR = os.path.dirname(CURRENT_PATH)
-CURRENT_DIR = CURRENT_DIR.replace("\\","/")
-RESULTS_DIR = CURRENT_DIR + "/results"
-if not os.path.exists(CURRENT_DIR+'/results'):
-    os.mkdir(CURRENT_DIR+'/results')
-if not os.path.exists(CURRENT_DIR+'/results/excel'):
-    os.mkdir(CURRENT_DIR+'/results/excel')
-
 
 # 获取cookies
 def setBiliBiliCookies(bv='BV1GJ411x7h7') -> str: 

@@ -4,20 +4,9 @@ import json
 import jieba.posseg as pseg
 import numpy as np
 import wordcloud
-import os
 from PIL import Image
 
-# 找一下位置，建一点目录
-CURRENT_PATH = os.path.abspath(__file__)
-CURRENT_DIR = os.path.dirname(CURRENT_PATH)
-CURRENT_DIR = CURRENT_DIR.replace("\\","/")
-RESULTS_DIR = CURRENT_DIR + "/results"
-if not os.path.exists(CURRENT_DIR+'/results/json'):
-    os.mkdir(CURRENT_DIR+'/results/json')
-if not os.path.exists(CURRENT_DIR+'/results/words-count-txt'):
-    os.mkdir(CURRENT_DIR+'/results/words-count-txt')
-if not os.path.exists(CURRENT_DIR+'/results/wordcloud'):
-    os.mkdir(CURRENT_DIR+'/results/wordcloud')
+from .path import CURRENT_DIR, RESULTS_DIR
 
 # 统计词频
 def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:

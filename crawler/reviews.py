@@ -3,12 +3,7 @@ import time
 import requests
 import os
 
-CURRENT_PATH = os.path.abspath(__file__)
-CURRENT_DIR = os.path.dirname(CURRENT_PATH)
-CURRENT_DIR = CURRENT_DIR.replace("\\","/")
-RESULTS_DIR = CURRENT_DIR + "/results"
-if not os.path.exists(CURRENT_DIR+'/results/txt'):
-    os.mkdir(CURRENT_DIR+'/results/txt')
+from .path import RESULTS_DIR
 
 # 爬取评论
 def fetch_comments(video_bv, cookies, max_pages=100, sleeptime = 1):
