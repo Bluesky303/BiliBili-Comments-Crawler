@@ -12,7 +12,7 @@ from .path import CURRENT_DIR, RESULTS_DIR
 def words_count(txt_name='default.txt', txt_path = RESULTS_DIR+"/txt/") -> list:
     s = open(txt_path+txt_name, 'r', encoding='utf-8').read()
     # 结巴分词，分词表见./resources/stopwords
-    jieba.load_userdict(txt_path+txt_name)
+    # jieba.load_userdict(txt_path+txt_name)
     allwords = jieba.lcut(s)
     # 加载停用词用于删除，不统计这些词
     stopwords = open(CURRENT_DIR+'/resources/stopwords/stopwords.txt', 'r', encoding='utf-8').read()
