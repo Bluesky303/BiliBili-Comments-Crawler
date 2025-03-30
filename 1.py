@@ -1,11 +1,12 @@
-'''评论获取'''
-import time
 import requests
+import time
+import pandas as pd
 
-from .path import RESULTS_DIR
-
-# 爬取评论
-def fetch_comments(video_bv, cookies, max_pages=100, sleeptime = 1):
+data = pd.read_excel("./Codes/1.xlsx", sheet_name="Sheet1")
+bvlist = data.iloc[:, 2]
+cookies = "SESSDATA=779d6160%2C1758799715%2C6db2e%2A32CjBPtZzrDj2TEzrY-9_Vm1x05PMHgU-Bvnyzqto2Qsb2_htELe2GxFOT04KvE88fqKwSVmpVOWNaTThhLURQcmFONEhRY1NIa0o0UXFkYUpzQnNzMncxb2tGMW1UWUNLT1o1VFVZbHZzS2NNVzVhUGJGdEp6angxUVhHTWtZRUs2cTdTU29fc1NRIIEC;"
+    
+def fetch_comments(video_bv, cookies, max_pages=2, sleeptime = 1):
     # 构造请求头
     headers = {
         'Cookie': cookies,
@@ -38,14 +39,13 @@ def fetch_comments(video_bv, cookies, max_pages=100, sleeptime = 1):
                 elif data and 'replies' in data['data']:
                     for comment in data['data']['replies']:
                         comment_info = {
-                            'name': comment['member']['uname'],
-                            'content': comment['content']['message'],
-                            'sex': comment['member']['sex'],
-                            'current level': comment['member']['level_info']['current_level'],
-                            'likes': comment['like'],
-                            'time': comment['ctime']
+                            '名字': comment['member']['uname'],
+                            '内容': comment['content']['message'],
+                            '等级': comment['member']['level_info']['current_level'],
+                            '点赞数': comment['like'],
+                            '时间': time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(comment['ctime']))
                         }
-                        comments.append(comment_info)
+                        comments.append(comment_info)    
                 if last_count == len(comments): # 说明到底了
                     break
                 last_count = len(comments)
@@ -64,30 +64,13 @@ def fetch_comments(video_bv, cookies, max_pages=100, sleeptime = 1):
     print('爬取完成')
     return comments
 
-# 去除评论中的表情文本，以免影响分词和词云图结果
-# 后果是所有[]中括号以及里面的都被删了，建立表情列表可能可以解决
-def purify(comment):    
-    return_comment = ''
-    open_braket_stack = []
-    current_pos = 0
-    delete_count = 0
-    while current_pos < len(comment):
-        #记录所有左中括号位置
-        if comment[current_pos] == '[':
-            open_braket_stack.append(current_pos-delete_count)
-        #遇到右中括号删去到上一个左中括号之间的内容并记录区间长度
-        elif comment[current_pos] == ']' and open_braket_stack != []:
-            return_comment = return_comment[:open_braket_stack[-1]]
-            delete_count = current_pos-open_braket_stack[-1]+1
-            open_braket_stack.pop()
-        #啥都不是直接加进来
-        if comment[current_pos] != ']':
-            return_comment += comment[current_pos]
-        current_pos += 1
-    return return_comment
 
-def write_txt(comments, filename='default.txt'):
-    with open(RESULTS_DIR+'/txt/'+filename, 'w', encoding='utf-8') as w:
-        w.write(str(len(comments))+'\n')
-        w.writelines(comments)
-        w.close()
+for num in range(len(bvlist)):
+    print(f'{num+1}/{len(bvlist)}')
+    sheetname = f'{num+1}'
+    comments = fetch_comments(bvlist[num], cookies)
+    with pd.ExcelWriter('./Codes/2.xlsx', engine='openpyxl', mode='a') as writer:
+        df = pd.DataFrame(comments)
+        df.to_excel(writer, sheet_name=sheetname, index=False)
+    
+    
