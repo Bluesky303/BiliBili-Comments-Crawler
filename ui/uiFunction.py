@@ -7,8 +7,6 @@ from .generateQR import generateQR, CheckQRThread
 from .delegate import TimeDelegate
 from .startrequest import RequestThread
 
-import time
-
 from typing import List, Dict, Tuple, Callable
 
 #设置运行图标

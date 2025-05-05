@@ -1,7 +1,6 @@
 """评论获取"""
 import time, requests, re
 import pandas as pd
-from openpyxl import load_workbook
 
 from .path import RESULTS_DIR
 

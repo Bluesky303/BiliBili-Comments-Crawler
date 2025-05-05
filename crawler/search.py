@@ -3,12 +3,13 @@ import time
 import requests
 import pandas as pd
 
-from playwright.sync_api import *
-
 from .path import RESULTS_DIR
 
 from typing import List, Dict, Tuple, Callable, Optional
 
+
+'''
+from playwright.sync_api import *
 # 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
 USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
 
@@ -45,6 +46,7 @@ def _setBiliBiliCookies(bv='BV1GJ411x7h7') -> str:
         return cookies
     except:
         return ''
+'''
 
 def search_video_list(keyword: str, 
                       begin_time: int = 0, end_time: int = 0, 
@@ -88,7 +90,6 @@ def search_video_list(keyword: str,
     page = 1
     # 请求头
     headers = {
-        'cookie': _setBiliBiliCookies(),
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'
     }
     # 遍历页码，最大页码超出跳报错break
