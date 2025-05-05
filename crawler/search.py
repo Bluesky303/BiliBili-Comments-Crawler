@@ -1,15 +1,29 @@
-'''获取视频列表'''
+"""获取视频列表"""
 import time
 import requests
-from playwright.sync_api import *
 import pandas as pd
 
+from playwright.sync_api import *
+
 from .path import RESULTS_DIR
+
+from typing import List, Dict, Tuple, Callable, Optional
+
 # 找一个浏览器，我这里用edge，其实不找也行，用playwright装好的
 USER_DIR_PATH = "C://Users/Blue_sky303/AppData/Local/Microsoft/Edge/User Data/Default"
 
-# 获取cookies
-def setBiliBiliCookies(bv='BV1GJ411x7h7') -> str: 
+def _setBiliBiliCookies(bv='BV1GJ411x7h7') -> str: 
+    """获取cookies, 由于懒得自己复制所以写了这个函数
+    需要在playwright打开的浏览器中默认登录才能用这个函数
+    不过如果需要用户操作这个函数还是不用比较好
+    ((自用
+
+    Args:
+        bv (str, optional): 选自己喜欢的视频
+
+    Returns:
+        str: cookies
+    """
     url = f'https://www.bilibili.com/video/'+bv
     # 模拟浏览器方式获取cookies
     try:
@@ -22,34 +36,69 @@ def setBiliBiliCookies(bv='BV1GJ411x7h7') -> str:
             page.close()
             browser.close()
             # os.system("taskkill /f /im msedge.exe") # edge占后台
-            # 转换格式
+            # 转换格式，原格式是List[Cookie]
             runCookies = ""
             for data in cookies:
-                if data['domain'] == '.bilibili.com': runCookies += data['name'] + "=" + data['value'] + "; "
+                if data['domain'] == '.bilibili.com': 
+                    runCookies += data['name'] + "=" + data['value'] + "; " # 只要domain是bilibili.com全部拿出来就行应该
         cookies = runCookies
         return cookies
     except:
         return ''
 
-# 根据关键词和时间范围检索视频列表
-def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, order = 'click', sleeptime = 0.1) -> list:
+def search_video_list(keyword: str, 
+                      begin_time: int = 0, end_time: int = 0, 
+                      maxpage: int = 50, 
+                      order: str = 'click', 
+                      sleeptime: float = 0.1, 
+                      error_sleeptime: float = 300,
+                      callback: Callable[[Dict[str, str]], None] = print) -> List[Dict]:
+    """根据关键词和时间范围检索视频列表
+
+    Args:
+        keyword (str): 关键词
+        begin_time (int, optional): 起始时间, 默认0就是不设置
+        end_time (int, optional): 结束时间, 默认0就是不设置
+        maxpage (int, optional): 最大页码, 默认50
+        order (str, optional): 搜索排序, 默认播放量
+            综合排序: totalrank
+            最多点击: click
+            最新发布: pubdate
+            最多弹幕: dm
+            最多收藏: stow
+            最多评论: scores
+            最多喜欢: attention(仅用于专栏)
+        sleeptime (float, optional): 爬取间隔时间, 默认0.1秒
+        error_sleeptime (float, optional): 错误重试间隔时间, 默认300秒
+        callback (Callable[[Dict[str, str]], None], optional): 回调函数, 默认print
+
+    Returns:
+        List[Dict]: 视频列表
+        单个视频内容: 
+            author: 作者
+            bvid: bv号
+            title: 标题
+            play: 播放量
+            video_review: 弹幕数
+            favorites: 收藏数
+            review: 评论数
+            date: 发布时间, 格式为"%Y-%m-%d %H:%M:%S"
+    """
     return_dict = []
     page = 1
     # 请求头
     headers = {
-    'cookie': setBiliBiliCookies(),
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'
-}
+        'cookie': _setBiliBiliCookies(),
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'
+    }
     # 遍历页码，最大页码超出跳报错break
     while page<maxpage+1:
         if begin_time or end_time:
-            print_begin_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(begin_time))
-            print_end_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(end_time))
-            print(f"时间段{print_begin_time}-{print_end_time}-搜索{keyword}-第{page}页")
+            callback({'search': f"时间段{begin_time}-{end_time}-搜索{keyword}-第{page}/{maxpage}页"})
         else:
-            print(f"搜索{keyword}-第{page}页")
+            callback({'search': f"搜索{keyword}-第{page}/{maxpage}页"})
         
-        # b站搜索api
+        # b站分类搜索api https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/search/search_request.md
         mainUrl = 'https://api.bilibili.com/x/web-interface/search/type'
         
         # api参数
@@ -60,9 +109,9 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
             'order': order,
         }
         
-        # 为0则不需要设置对应时间范围
-        if begin_time: params['pubtime_begin_s'] = begin_time
-        if end_time: params['pubtime_end_s'] = end_time
+        if begin_time and end_time: 
+            params['pubtime_begin_s'] = int(time.mktime(time.strptime(begin_time, "%Y/%m/%d")))
+            params['pubtime_end_s'] = int(time.mktime(time.strptime(end_time, "%Y/%m/%d")))
         
         try:
             response = requests.get(mainUrl, headers=headers, params=params)
@@ -90,23 +139,32 @@ def search_video_list(keyword: str, begin_time = 0, end_time = 0, maxpage = 50, 
             elif response.status_code == 412: # 412码，大概是被封ip了，歇着或者换ip罢
                 if not stoptime:
                     stoptime = time.asctime()
-                print(f"412了, 哥们从{stoptime}歇到现在")
-                time.sleep(300)
+                for i in range(error_sleeptime):
+                    time.sleep(1)
+                    callback({'error': f"412了, 从{stoptime}歇到现在, {error_sleeptime-i}秒后继续"})
                 page -= 1
             else:
-                print(f'请求失败，状态码：{response.status_code}')
+                callback({'error': f'请求失败，状态码：{response.status_code}'})
                 break
-            response.close()   
+            response.close()
         except Exception as e:
-            print('发生错误', e)
+            callback({'error': f'发生错误, 错误信息: {e}'})
             break
         time.sleep(sleeptime)  # 控制请求频率
         page += 1
-    print("爬取完成")
+    callback({'search_end': f"搜索视频列表结束"})
     return return_dict
 
-# 数据写入excel
-def write_excel(inputlist: list, filename = 'default.xlsx'): # 输入数据列表，格式与上面video_info相同
+def write_excel(inputlist: List[Dict], filename: str = 'default.xlsx'):
+    """将数据写入excel
+
+    Args:
+        inputlist (List[Dict]): 
+        filename (str, optional): 文件名, 默认default.xlsx
+    
+    Results:
+        产生一个excel文件, 内容为视频信息
+    """
     # 数据预处理
     data = {'author': [], 'bvid': [], 'title': [], 'play': [], 'video_review': [], 'favorites': [], 'review': [], 'date': []}
     for video in inputlist:
@@ -114,12 +172,20 @@ def write_excel(inputlist: list, filename = 'default.xlsx'): # 输入数据列�
             data[key].append(video[key])
     data = pd.DataFrame(data)
     # 写入excel
-    with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
+    with pd.ExcelWriter(RESULTS_DIR / 'excel' / filename, engine='openpyxl') as writer:
         data.to_excel(writer)
 
-#写入多个工作表，输入字典，key为工作表名字
-def sheets_write_excel(inputdict: dict, filename = 'default.xlsx'):
-    with pd.ExcelWriter(RESULTS_DIR+'/excel/'+filename, engine='openpyxl') as writer:
+def sheets_write_excel(inputdict: Dict[str, List[Dict]], filename: str = 'default.xlsx'):
+    """写入多个工作表，输入字典，key为工作表名字
+
+    Args:
+        inputdict (Dict[str, List[Dict]]): 按照多个时间搜索时需要这个函数, 输入字典key为时间段, value为时间段对应视频列表
+        filename (str, optional): 文件名, 默认default.xlsx
+    
+    Results:
+        产生一个excel文件, 内容为多个工作表，每个工作表为对应时间段下的视频信息
+    """
+    with pd.ExcelWriter(RESULTS_DIR / 'excel' / filename, engine='openpyxl') as writer:
         for name in inputdict:
             # 数据预处理
             data = {'author': [], 'bvid': [], 'title': [], 'play': [], 'video_review': [], 'favorites': [], 'review': [], 'date': []}
@@ -130,13 +196,35 @@ def sheets_write_excel(inputdict: dict, filename = 'default.xlsx'):
             # 写入excel
             data.to_excel(writer,sheet_name=name)
     
-# 关键词列表搜索，合并关键词列表在同一时间段下的所有视频,开始时间和结束时间为时间戳
-# 写入excel文件待用，名字用第一个关键词,工作表名用开始时间-结束时间，没有输入时间不用时间
-def keyword_list_search(keyword_list: list, begin_time=0, end_time=0, maxpage = 50, sort_key = 'review', to_excel = True) -> list:
+def keyword_list_search(keyword_list: list, 
+                        begin_time: Optional[str], 
+                        end_time: Optional[str], 
+                        maxpage: int = 50, 
+                        sort_key: str = 'review', 
+                        to_excel: bool = True, 
+                        callback: Callable[[Dict[str, str]], None] = print
+                        ) -> List:
+    """关键词列表搜索, 合并关键词列表在同一时间段下的所有视频, 写入excel文件待用
+
+    Args:
+        maxpage (int, optional): 搜索页面最大页码, 默认50
+        sort_key (str, optional): 排序依据, 默认评论数
+        to_excel (bool, optional): 是否写入excel, 默认True, 这里主要是给time_list_search留的, 笑死
+        callback (Callable[[Dict[str, str]], None], optional): 回调函数, 默认print
+
+    Returns:
+        List[Dict]: 视频列表
+    
+    Results:
+        产生一个excel文件, 内容为搜索到的视频信息, 文件名用第一个关键词, 工作表名用开始时间-结束时间, 没有输入时间不用时间
+    """
     result_list = []
-    for keyword in keyword_list: 
-        result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage)
-    # 去重，以bvid作为特征
+    for keyword in keyword_list:
+        if not begin_time and not end_time:
+            result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage, callback=callback)
+        else:
+            result_list += search_video_list(keyword, maxpage=maxpage, callback=callback)
+    # 多个关键词会有重复视频，需要去重，以bvid作为特征
     bvlist = []
     for video in result_list:
         if video['bvid'] not in bvlist:
@@ -147,23 +235,36 @@ def keyword_list_search(keyword_list: list, begin_time=0, end_time=0, maxpage = 
     result_list = sorted(result_list, key = lambda x: x[sort_key], reverse=True)
     # 写入对应excel
     if to_excel:
-        if not begin_time and not end_time:
-            begin_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(begin_time))
-            end_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(end_time))
-            excel_file_name = f'{keyword_list[0]}-{begin_time} to {end_time}.xlsx'
+        if begin_time and end_time:
+            excel_file_name = f'{keyword_list[0]}-{begin_time.replace("/", "-")} to {end_time.replace("/", "-")}.xlsx'
         else:
             excel_file_name = f'{keyword_list[0]}.xlsx'
         write_excel(result_list, filename = excel_file_name)
     return result_list
     
-# 时间列表搜索，其中时间列表每个元素是开始时间和结束时间的元组，
-def time_list_search(keyword_list, time_list = [], maxpage = 50, sort_key = 'review'):
+def time_list_search(keyword_list: List, 
+                     time_list: List[Tuple[str, str]], 
+                     maxpage: int = 50, 
+                     sort_key: str = 'review', 
+                     callback: Callable[[Dict[str, str]], None] = print):
+    """时间列表搜索, 合并关键词列表在对应时间段下的所有视频
+
+    Args:
+        keyword_list (List): 关键词列表
+        time_list (List[Tuple[str, str]]): 时间列表, 每个元素是开始时间和结束时间的元组, 格式是"%Y/%m/%d"
+        maxpage (int, optional): 最大页码, 默认50
+        sort_key (str, optional): 排序依据, 默认评论数
+        callback (Callable[[Dict[str, str]], None], optional): 回调函数, 默认print
+        
+    Results:
+        产生一个excel文件, 名字为第一个关键词, 有多个工作表
+        工作表名是 开始时间-结束时间 , 还有一个all工作表, 包含所有搜索到的视频
+        每个工作表包含对应时间段下的视频信息
+    """
     result_dict = {'all':[]}
-    for time_tuple in time_list:
-        return_result = keyword_list_search(keyword_list, time_tuple[0], time_tuple[1], maxpage = maxpage, sort_key=sort_key, to_excel=False)
-        begin_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(time_tuple[0]))
-        end_time = time.strftime("%Y%m%d.%H%M%S",time.localtime(time_tuple[1]))
-        result_dict[f'{begin_time}-{end_time}'] = return_result
+    for (begin_time, end_time) in time_list:
+        return_result = keyword_list_search(keyword_list, begin_time, end_time, maxpage = maxpage, sort_key=sort_key, to_excel=False, callback=callback)
+        result_dict[f'{begin_time.replace("/", "-")}-{end_time.replace("/", "-")}'] = return_result
         result_dict['all'] += return_result
     # 总列表去重排序
     bvlist = []

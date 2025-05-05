@@ -1,3 +1,5 @@
+"""获取视频列表总时长, 之前需要所以写了, 没做成函数开放"""
+
 import time
 import requests
 import os

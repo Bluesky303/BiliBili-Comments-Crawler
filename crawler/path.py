@@ -1,12 +1,13 @@
-import os
-# 找一下位置，加点目录
-CURRENT_PATH = os.path.abspath(__file__)
-CURRENT_DIR = os.path.dirname(CURRENT_PATH)
-CURRENT_DIR = CURRENT_DIR.replace("\\","/")
-RESULTS_DIR = CURRENT_DIR + "/results"
+"""内容保存的目录"""
 
-path_list = ["", "/txt", "/excel", "/json", "/words-count-txt", "/wordcloud"]
-path_list = [RESULTS_DIR + path for path in path_list]
+import pathlib
+
+# 获取目录位置
+CURRENT_PATH = pathlib.Path(__file__).parent # 之后调整为自选目录
+RESULTS_DIR = CURRENT_PATH / "results"
+
+# 创建子目录
+path_list = ["txt", "excel", "json", "wordcloud"]
+path_list = [RESULTS_DIR / path for path in path_list]
 for path in path_list:
-    if not os.path.exists(path):
-        os.mkdir(path)
+    path.mkdir(parents=True, exist_ok=True)
