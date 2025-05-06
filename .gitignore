@@ -1,3 +1,9 @@
 myenv/
 
 __pycache__/
+
+# build file
+build/
+dist/
+main.spec
+QRCode.png

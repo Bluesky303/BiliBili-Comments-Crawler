@@ -50,6 +50,7 @@ def _setBiliBiliCookies(bv='BV1GJ411x7h7') -> str:
 
 def search_video_list(keyword: str, 
                       begin_time: int = 0, end_time: int = 0, 
+                      cookies: str = '',
                       maxpage: int = 50, 
                       order: str = 'click', 
                       sleeptime: float = 0.1, 
@@ -88,9 +89,11 @@ def search_video_list(keyword: str,
     """
     return_dict = []
     page = 1
+    stoptime = 0
     # 请求头
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.47',
+        'Cookie': cookies,
     }
     # 遍历页码，最大页码超出跳报错break
     while page<maxpage+1:
@@ -140,10 +143,11 @@ def search_video_list(keyword: str,
             elif response.status_code == 412: # 412码，大概是被封ip了，歇着或者换ip罢
                 if not stoptime:
                     stoptime = time.asctime()
+                print(response)
                 for i in range(error_sleeptime):
                     time.sleep(1)
                     callback({'error': f"412了, 从{stoptime}歇到现在, {error_sleeptime-i}秒后继续"})
-                page -= 1
+#                page -= 1
             else:
                 callback({'error': f'请求失败，状态码：{response.status_code}'})
                 break
@@ -200,6 +204,7 @@ def sheets_write_excel(inputdict: Dict[str, List[Dict]], filename: str = 'defaul
 def keyword_list_search(keyword_list: list, 
                         begin_time: Optional[str], 
                         end_time: Optional[str], 
+                        cookies: str = '',
                         maxpage: int = 50, 
                         sort_key: str = 'review', 
                         to_excel: bool = True, 
@@ -222,9 +227,9 @@ def keyword_list_search(keyword_list: list,
     result_list = []
     for keyword in keyword_list:
         if not begin_time and not end_time:
-            result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage, callback=callback)
+            result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage, callback=callback, cookies=cookies)
         else:
-            result_list += search_video_list(keyword, maxpage=maxpage, callback=callback)
+            result_list += search_video_list(keyword, maxpage=maxpage, callback=callback, cookies=cookies)
     # 多个关键词会有重复视频，需要去重，以bvid作为特征
     bvlist = []
     for video in result_list:
@@ -245,6 +250,7 @@ def keyword_list_search(keyword_list: list,
     
 def time_list_search(keyword_list: List, 
                      time_list: List[Tuple[str, str]], 
+                     cookies: str = '',
                      maxpage: int = 50, 
                      sort_key: str = 'review', 
                      callback: Callable[[Dict[str, str]], None] = print):
@@ -264,7 +270,7 @@ def time_list_search(keyword_list: List,
     """
     result_dict = {'all':[]}
     for (begin_time, end_time) in time_list:
-        return_result = keyword_list_search(keyword_list, begin_time, end_time, maxpage = maxpage, sort_key=sort_key, to_excel=False, callback=callback)
+        return_result = keyword_list_search(keyword_list, begin_time, end_time, maxpage = maxpage, sort_key=sort_key, to_excel=False, callback=callback, cookies=cookies)
         result_dict[f'{begin_time.replace("/", "-")}-{end_time.replace("/", "-")}'] = return_result
         result_dict['all'] += return_result
     # 总列表去重排序
