@@ -50,18 +50,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def QRCodeStart(self):
         try:
             self.QRCodeKey = generateQR()
+            QRCode = QPixmap("./QRCode.png")
+            self.QRCode.setPixmap(QRCode)
+            self.QRCodeThread = CheckQRThread(self.QRCodeKey)
+            self.QRCodeThread.returnStatus.connect(self.update_result)
+            self.QRCodeThread.returnCookies.connect(self.returnCookies)
+            
+            self.QRCodeThread.start()
         except Exception as e:
             self.QRCodeStatus.setText(f"error:{str(e)}")
-        QRCode = QPixmap("./QRCode.png")
-        self.QRCode.setPixmap(QRCode)
-        self.QRCodeThread = CheckQRThread(self.QRCodeKey)
-        self.QRCodeThread.returnStatus.connect(self.update_result)
-        self.QRCodeThread.returnCookies.connect(self.returnCookies)
+            self.QRCodeThread = None
         
-        self.QRCodeThread.start()
     
     def update_result(self, message):
         self.QRCodeStatus.setText(message)
+        if message == "代理错误":
+            self.QRCode.setText("无法获取二维码状态")
     
     def returnCookies(self, cookies):
         self.cookies = cookies
@@ -76,9 +80,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return self.cookies != ""
     
     def RefreshButtonClicked(self):
-        self.QRCodeThread.terminate()
-        self.QRCodeThread.wait()
-        self.QRCodeThread = None
+        if self.QRCodeThread is not None:
+            self.QRCodeThread.terminate()
+            self.QRCodeThread.wait()
+            self.QRCodeThread = None
         self.QRCodeStart()
     
     # 时间关键词部分

@@ -64,9 +64,11 @@ class CheckQRThread(QThread):
                 cookies = re.search(r"SESSDATA=[^&]*", url).group()
                 self.returnCookies.emit(cookies)
                 
-                break                
+                break     
+            except requests.exceptions.ProxyError:
+                self.returnStatus.emit("代理错误")
+                self.quit()       
             except Exception as e:
                 self.returnStatus.emit(f"error:{e}")
-                print(traceback.format_exc())
             time.sleep(0.5)
 
