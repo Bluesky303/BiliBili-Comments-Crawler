@@ -89,12 +89,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Time.setModel(self.timeModel)
         self.TimeNew.clicked.connect(self.TimeNewClicked)
         self.TimeDelete.clicked.connect(self.TimeDeleteClicked)
+        self.timeModel.dataChanged.connect(self.updateTimeKeyword)
         
         self.keywordModel = QStandardItemModel()
         self.Keywords.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.Keywords.setModel(self.keywordModel)
         self.KeywordNew.clicked.connect(self.KeywordNewClicked)
         self.KeywordDelete.clicked.connect(self.KeywordDeleteClicked)
+        self.keywordModel.dataChanged.connect(self.updateTimeKeyword)
         
         self.requestThread = RequestThread()
         self.requestThread.message.connect(self.receive_message)

@@ -11,7 +11,7 @@ from typing import Dict, Callable
 
 def time_list_allworks(keyword_list: list, cookies: str, time_list: list, callback: Callable[[Dict[str, str]], None] = print):
     callback({'search': '正在准备开始搜索...'})
-    time_list_search(keyword_list=keyword_list, time_list=time_list, callback=callback, maxpage=1)
+    time_list_search(keyword_list=keyword_list, time_list=time_list, callback=callback, maxpage=1, cookies=cookies)
     callback({'fetch': '正在读取获取到的视频列表信息...'})
     data = pd.read_excel(RESULTS_DIR / f'excel/{keyword_list[0]}.xlsx', sheet_name=None)
     names = data.keys()

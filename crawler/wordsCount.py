@@ -7,7 +7,7 @@ import pandas as pd
 import wordcloud
 from PIL import Image
 
-from .path import RESULTS_DIR
+from .path import RESULTS_DIR, CURRENT_PATH
 
 import pathlib
 from typing import List, Tuple, Dict
@@ -21,7 +21,7 @@ def words_count(excel_name: str, excel_path: pathlib.Path = RESULTS_DIR / "excel
         (List[Tuple[str, Tuple[int, str]]]): 词频统计结果, 是元组列表, 每个元组为(词, (词频, 词性)), 有利于排序
     """
     # 加载停用词，这些词不会被统计
-    stopwords = open(RESULTS_DIR.parent / 'resources/stopwords.txt', 'r', encoding='utf-8').read()
+    stopwords = open(CURRENT_PATH / 'resources/stopwords.txt', 'r', encoding='utf-8').read()
     stopwords_list = list(stopwords.split("\n"))
     
     data = pd.read_excel(excel_path / excel_name, sheet_name=None)
@@ -65,13 +65,13 @@ def save_words_count_to_json(words_list: list,
 def generate_wordcloud(words_dict: Dict[str, Tuple[int, str]],
                        wordcloud_name: str = "wordcloud.png",
                        wordcloud_path: pathlib.Path = RESULTS_DIR / 'wordcloud',
-                       mask_pic_path: pathlib.Path = RESULTS_DIR.parent / "resources/mask_pic",
+                       mask_pic_path: pathlib.Path = CURRENT_PATH / "resources/mask_pic",
                        mask_pic_name: str = '1.png',
                        background_color: str = 'white',
                        width: int = 800,
                        height: int = 600,
                        font_name: str = 'simfang.ttf', 
-                       font_path: pathlib.Path = RESULTS_DIR.parent / 'resources/font', 
+                       font_path: pathlib.Path = CURRENT_PATH / 'resources/font', 
                        if_show: bool = False, 
                        ):
     """生成词云图

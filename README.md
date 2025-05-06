@@ -15,3 +15,6 @@
 
 
 # 用于获取b站评论的
+
+打包命令
+pyinstaller --onefile --add-data "crawler/resources/**/*;crawler/resources/" --noconsole main.py

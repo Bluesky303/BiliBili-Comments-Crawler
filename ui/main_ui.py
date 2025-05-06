@@ -74,6 +74,7 @@ class Ui_MainWindow(object):
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_5.addWidget(self.label_3)
         self.QRCodeStatus = QtWidgets.QLabel(self.centralwidget)
+        self.QRCodeStatus.setMaximumSize(QtCore.QSize(100, 16777215))
         font = QtGui.QFont()
         font.setFamily("宋体")
         self.QRCodeStatus.setFont(font)
