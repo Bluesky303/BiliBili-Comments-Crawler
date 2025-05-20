@@ -24,7 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initUI(self):
         super(Ui_MainWindow, self).__init__()
         self.setupUi(self)
-        self.retranslateUi(self)
+        self.retranslateUi(self) 
         self.setWindowTitle("B站评论获取")
         
         self.setWindowIcon(QIcon('./icon.ico'))

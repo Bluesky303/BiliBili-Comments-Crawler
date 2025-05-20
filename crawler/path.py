@@ -19,4 +19,3 @@ path_list = ["txt", "excel", "json", "wordcloud"]
 path_list = [RESULTS_DIR / path for path in path_list]
 for path in path_list:
     path.mkdir(parents=True, exist_ok=True)
-'''SESSDATA=e098ad7a,1762007364,409d2*51CjAEDPgncByva_UuivGY1A4jawcehKevGhe-7JaCUHXD9qjBCldMJWcHYdvjF-T45goSVnNkR1NidWtvY3hTNGhhNGpZWWxqbUx0MnY2Q1lTdUVkZ2JMdVZJa1Zvd2VWcnVUaGs5VHdxNWJ6YmNvYWpWZlEyaktUYjN5UE13X1FpNFVQcXRjcmdnIIEC'''
