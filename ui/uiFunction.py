@@ -27,12 +27,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def initUI(self):
         super(Ui_MainWindow, self).__init__()
-        self.windowIcon = QIcon('./icon.ico')
         self.setupUi(self)
         self.retranslateUi(self) 
         self.setWindowTitle("B站评论获取")
         
-        self.setWindowIcon(QIcon('./icon.ico'))
+        self.setWindowIcon(QIcon(str(CURRENT_PATH / 'resources/icon.ico')))
         
         self.OptionInit()
         self.CookiesInit()
@@ -57,7 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def QRCodeStart(self):
         try:
             self.QRCodeKey = generateQR()
-            QRCode = QPixmap("./QRCode.png")
+            QRCode = QPixmap(str(CURRENT_PATH / "QRCode.png"))
             self.QRCode.setPixmap(QRCode)
             self.QRCodeThread = CheckQRThread(self.QRCodeKey)
             self.QRCodeThread.returnStatus.connect(self.update_result)

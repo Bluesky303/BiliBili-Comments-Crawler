@@ -110,4 +110,6 @@ def purify(content: str) -> str:
     Returns:
         str: 去除中括号及其内容后的评论内容
     """
+    ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
+    content = ILLEGAL_CHARACTERS_RE.sub('', content)
     return re.sub(r'\[.*?\]', '', content)

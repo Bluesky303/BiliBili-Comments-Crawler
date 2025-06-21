@@ -1,6 +1,8 @@
 import qrcode, requests, time, re, traceback
 from PyQt5.QtCore import QThread, pyqtSignal
 
+from crawler import CURRENT_PATH
+
 from PIL import Image
 
 def generateQR() -> str:
@@ -24,7 +26,7 @@ def generateQR() -> str:
         img: Image.Image = qr.make_image(fill_color="black", back_color="white")
         img = img.convert("RGBA")
         img = img.resize((100, 100))
-        img.save("./QRCode.png")
+        img.save(CURRENT_PATH / "QRCode.png")
     else: 
         raise Exception("获取二维码失败")
     return qrcodekey
