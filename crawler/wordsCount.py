@@ -12,7 +12,7 @@ from .path import RESULTS_DIR, CURRENT_PATH
 import pathlib
 from typing import List, Tuple, Dict
 
-def words_count(excel_name: str, excel_path: pathlib.Path = RESULTS_DIR / "excel") -> List[Tuple[str, Tuple[int, str]], ]:
+def words_count(excel_name: str, excel_path: pathlib.Path = RESULTS_DIR / "comments") -> List[Tuple[str, Tuple[int, str]], ]:
     """读取整个评论excel文件, 分词并统计词频和词性 (所有sheet, 即多个视频整合)
     停用词不被统计, 可以在./resources/stopwords.txt中添加
 
@@ -51,12 +51,12 @@ def words_count(excel_name: str, excel_path: pathlib.Path = RESULTS_DIR / "excel
     words_list.sort(key=lambda x: x[1][0], reverse=True)  # 按词频排序
     return words_list
 
-# 保存词频统计结果到./results/words_count.json，用于后续处理
+# 保存词频统计结果到./results/json/words_count.json，用于后续处理
 def save_words_count_to_json(words_list: list, 
                              words_count_json_name: str = "default_words_count.json", 
                              json_path: pathlib.Path = RESULTS_DIR / "json"
                              ):
-    """保存词频统计结果到./results/words_count.json, 用于后续处理
+    """保存词频统计结果到./results/json/words_count.json, 用于后续处理
     
     """
     json.dump(dict(words_list), open(json_path / words_count_json_name, 'w', encoding='utf-8'), indent=4, ensure_ascii=False)
@@ -70,8 +70,6 @@ def generate_wordcloud(words_dict: Dict[str, Tuple[int, str]],
                        background_color: str = 'white',
                        width: int = 800,
                        height: int = 600,
-                       font_name: str = 'simfang.ttf', 
-                       font_path: pathlib.Path = CURRENT_PATH / 'resources/font', 
                        if_show: bool = False, 
                        ):
     """生成词云图
@@ -83,11 +81,16 @@ def generate_wordcloud(words_dict: Dict[str, Tuple[int, str]],
     # 预处理
     for word in words_dict:
         words_dict[word] = words_dict[word][0] # 转化成 词语, 词频 对
+        
+    if pathlib.Path(wordcloud_name).exists():
+        mask_pic_path = mask_pic_path / mask_pic_name
+    else:
+        mask_pic_path = mask_pic_path / '1.png'
     w = wordcloud.WordCloud(background_color=background_color,
                             width=width,
                             height=height,
-                            font_path=font_path / font_name,
-                            mask=np.array(Image.open(mask_pic_path / mask_pic_name)),
+                            font_path=CURRENT_PATH / 'resources/font/simfang.ttf',
+                            mask=np.array(Image.open(mask_pic_path)),
                             scale=20).fit_words(words_dict)
     # 词云图生成结果展示
     img = w.to_image()
@@ -119,8 +122,14 @@ def handle(file_name, del_list = ['c', 'm', 'u', 'b', 'e', 'p', 'q', 'o', 's', '
     return words_count
 
 # 完成以上操作(丝滑小连招
-def save_words_to_all(file_name='default'):
+def save_words_to_all(file_name='default', 
+                       mask_pic_name: str = '1.png',
+                       background_color: str = 'white',
+                       width: int = 800,
+                       height: int = 600,
+                       if_show: bool = False, 
+                       ):
     word_list = words_count(file_name+'.xlsx')
     save_words_count_to_json(word_list, file_name+'_words_count.json')
     wordscount = handle(file_name)
-    generate_wordcloud(wordscount, wordcloud_name = file_name+'_wordcloud.png')
+    generate_wordcloud(wordscount, wordcloud_name = file_name+'_wordcloud.png', mask_pic_name = mask_pic_name, background_color = background_color, width = width, height = height, if_show = if_show)

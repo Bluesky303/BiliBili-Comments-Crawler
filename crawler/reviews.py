@@ -25,7 +25,7 @@ def fetch_comments(video_bv: str, cookies: str, filename: str, max_pages: int = 
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0'
     }
     
-    file_path = RESULTS_DIR / 'excel' / (filename + '.xlsx')
+    file_path = RESULTS_DIR / 'comments' / (filename + '.xlsx')
     page = 1
     # 记录上轮获取评论数
     # 当评论页面数小于max_pages时，上轮评论数和本轮相同，因此可以结束
@@ -50,7 +50,7 @@ def fetch_comments(video_bv: str, cookies: str, filename: str, max_pages: int = 
             if response.status_code == 200:
                 data = response.json()
                 stoptime = 0
-                if data['data']['replies'] is None:
+                if 'data' not in data or data['data']['replies'] is None:
                     callback({'error': f'获取{video_bv}第{page}页失败，返回空，正在重试\n{data}'})
                     time.sleep(10)
                     page += 1

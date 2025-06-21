@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>959</width>
-    <height>632</height>
+    <width>673</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
@@ -201,16 +201,20 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="StartButton">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-               </font>
-              </property>
-              <property name="text">
-               <string>Start</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QPushButton" name="StartButton">
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Start Request</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QTextBrowser" name="LogPrinter">
@@ -338,7 +342,299 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="option1"/>
+      <widget class="QWidget" name="option1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="2" column="3">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Wordcloud width</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="WordcloudWidth">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>800</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QLabel" name="label_11">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Wordcloud height</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="WordcloudHeight">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>600</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Video List Maxpage</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="VideoListMaxpage">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>50</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLabel" name="label_9">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Wordcloud Maskpic Name</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="WordcloudMaskpicName">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>1.png</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Video List Sortkey</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="VideoListSortkey">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <item>
+               <property name="text">
+                <string>review</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>video_review</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>play</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>favorites</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>date</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>title</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Comments Maxpage</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="CommentsMaxpage">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>100</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="2">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="5" column="2">
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="2">
+           <widget class="QCheckBox" name="WordcloudIfshow">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>Show after generate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+              <property name="text">
+               <string>Video List File Name</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="VideoListName">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+               </font>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page"/>
      </widget>
     </item>
    </layout>
@@ -348,7 +644,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>959</width>
+     <width>673</width>
      <height>22</height>
     </rect>
    </property>

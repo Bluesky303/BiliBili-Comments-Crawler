@@ -15,7 +15,7 @@ if getattr(sys, 'frozen', False):
 
 
 # 创建子目录
-path_list = ["txt", "excel", "json", "wordcloud"]
+path_list = ["video_list", "comments", "json", "wordcloud"]
 path_list = [RESULTS_DIR / path for path in path_list]
 for path in path_list:
     path.mkdir(parents=True, exist_ok=True)

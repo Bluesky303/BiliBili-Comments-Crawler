@@ -177,7 +177,7 @@ def write_excel(inputlist: List[Dict], filename: str = 'default.xlsx'):
             data[key].append(video[key])
     data = pd.DataFrame(data)
     # 写入excel
-    with pd.ExcelWriter(RESULTS_DIR / 'excel' / filename, engine='openpyxl') as writer:
+    with pd.ExcelWriter(RESULTS_DIR / 'video_list' / filename, engine='openpyxl') as writer:
         data.to_excel(writer)
 
 def sheets_write_excel(inputdict: Dict[str, List[Dict]], filename: str = 'default.xlsx'):
@@ -190,7 +190,7 @@ def sheets_write_excel(inputdict: Dict[str, List[Dict]], filename: str = 'defaul
     Results:
         产生一个excel文件, 内容为多个工作表，每个工作表为对应时间段下的视频信息
     """
-    with pd.ExcelWriter(RESULTS_DIR / 'excel' / filename, engine='openpyxl') as writer:
+    with pd.ExcelWriter(RESULTS_DIR / 'video_list' / filename, engine='openpyxl') as writer:
         for name in inputdict:
             # 数据预处理
             data = {'author': [], 'bvid': [], 'title': [], 'play': [], 'video_review': [], 'favorites': [], 'review': [], 'date': []}
@@ -253,6 +253,7 @@ def time_list_search(keyword_list: List,
                      cookies: str = '',
                      maxpage: int = 50, 
                      sort_key: str = 'review', 
+                     time_list_name: str = '',
                      callback: Callable[[Dict[str, str]], None] = print):
     """时间列表搜索, 合并关键词列表在对应时间段下的所有视频
 
@@ -268,6 +269,8 @@ def time_list_search(keyword_list: List,
         工作表名是 开始时间-结束时间 , 还有一个all工作表, 包含所有搜索到的视频
         每个工作表包含对应时间段下的视频信息
     """
+    if time_list_name == '':
+        time_list_name = keyword_list[0]
     result_dict = {'all':[]}
     for (begin_time, end_time) in time_list:
         return_result = keyword_list_search(keyword_list, begin_time, end_time, maxpage = maxpage, sort_key=sort_key, to_excel=False, callback=callback, cookies=cookies)
@@ -282,4 +285,4 @@ def time_list_search(keyword_list: List,
             result_dict['all'].remove(video)
     result_dict['all'] = sorted(result_dict['all'], key = lambda x: x[sort_key], reverse=True)
     # 写入excel
-    sheets_write_excel(result_dict, filename=f'{keyword_list[0]}.xlsx')
+    sheets_write_excel(result_dict, filename=f'{time_list_name}.xlsx')
