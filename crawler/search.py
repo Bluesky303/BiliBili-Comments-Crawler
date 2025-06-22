@@ -97,7 +97,7 @@ def search_video_list(keyword: str,
     }
     # 遍历页码，最大页码超出跳报错break
     while page<maxpage+1:
-        if begin_time or end_time:
+        if begin_time and end_time:
             callback({'search': f"时间段{begin_time}-{end_time}-搜索{keyword}-第{page}/{maxpage}页"})
         else:
             callback({'search': f"搜索{keyword}-第{page}/{maxpage}页"})
@@ -226,7 +226,7 @@ def keyword_list_search(keyword_list: list,
     """
     result_list = []
     for keyword in keyword_list:
-        if not begin_time and not end_time:
+        if begin_time and end_time:
             result_list += search_video_list(keyword, begin_time=begin_time, end_time=end_time, maxpage=maxpage, callback=callback, cookies=cookies)
         else:
             result_list += search_video_list(keyword, maxpage=maxpage, callback=callback, cookies=cookies)
