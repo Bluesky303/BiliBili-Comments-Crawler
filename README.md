@@ -28,13 +28,15 @@
 ### 或者自己打包
 - 打包命令:
     ```bash
-    pyinstaller --onefile --add-data "crawler/resources/**/*;crawler/resources/" --add-data "icon.ico;icon.ico" --noconsole main.py -i icon.ico --name=BiliBiliCommentsCrawler.exe
+    pyinstaller main.spec
     ```
 
 ## 技术栈
 - GUI框架: PyQt5
 
 - B站API: 参考 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
+
+- 网络请求: requests
 
 - 文本分析: jieba 中文分词
 

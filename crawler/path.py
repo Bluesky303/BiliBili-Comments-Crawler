@@ -8,7 +8,7 @@ CURRENT_PATH = pathlib.Path(__file__).parent # 之后调整为自选目录
 RESULTS_DIR = CURRENT_PATH / "results"
 # 如果是打包后的目录
 if getattr(sys, 'frozen', False):
-    CURRENT_PATH = pathlib.Path(sys._MEIPASS)
+    CURRENT_PATH = pathlib.Path(sys._MEIPASS)/"crawler"
     RESULTS_DIR = pathlib.Path(sys.executable).parent/"results"
     
 

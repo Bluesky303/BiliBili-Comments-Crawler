@@ -5,5 +5,4 @@ __pycache__/
 # build file
 build/
 dist/
-*.spec
 QRCode.png
