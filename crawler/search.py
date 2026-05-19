@@ -53,7 +53,7 @@ def search_video_list(keyword: str,
                       cookies: str = '',
                       maxpage: int = 50, 
                       order: str = 'click', 
-                      sleeptime: float = 0.1, 
+                      sleeptime: float = 1, 
                       error_sleeptime: float = 300,
                       callback: Callable[[Dict[str, str]], None] = print) -> List[Dict]:
     """根据关键词和时间范围检索视频列表
